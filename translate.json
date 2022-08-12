@@ -1,0 +1,23 @@
+{
+    "recámaras": "recamaras",
+    "Description": "descripcion",
+    "Title": "nombre",
+    "baño": "banos",
+    "Characteristics": "características",
+    "Images": "foto",
+    "Coordinates": "coordenadas",
+    "estacionamientos": "cant_estacionamiento",
+    "construcción": "m2_construccion",
+    "terreno": "m2_terreno",
+    "largo": "largo",
+    "Price": "precio",
+    "ancho": "ancho",
+    "Año de construcción": "antiguedad",
+    "Cantidad de pisos en el edificio": "pisos_numero_piso",
+    "Piso": "pisos_numero_piso",
+    "ID": "ID",
+    "Mantenimiento": "mtto",
+    "Fecha de publicación": "fecha_publicacion",
+    "URL": "publicacion_url",
+    "location": "direccion"
+}
