@@ -53,15 +53,13 @@ fieldnames = ["ID", "fecha_publicacion", "nombre", "precio", "recamaras", "banos
 
 def getListings():
     driver = getChromeDriver()
-    url = input('1. Open browser (EasyBroker in this folder)'
-                '\n2. Login and goto properties listing'
-                '\n3. Apply required filters'
-                '\n4. Copy the URL of page#2 from botton of page (left click in right arrow icon and copy link)'
-                '\nPaste start URL here or just press enter for default URL: ')
-    if url == "":
-        url = "https://www.easybroker.com/agent/properties/search?network_search=true&page=2&reset_page=true&search_criteria%5Bage%5D=&search_criteria%5Bamenity_ids%5D%5B%5D=&search_criteria%5Bgeolocation%5D=&search_criteria%5Bmax_bathroom%5D=&search_criteria%5Bmax_bedroom%5D=&search_criteria%5Bmax_lot_size_square_meters%5D=&search_criteria%5Bmax_parking_spaces%5D=&search_criteria%5Bmax_total_square_meters%5D=&search_criteria%5Bmin_bathroom%5D=&search_criteria%5Bmin_bedroom%5D=&search_criteria%5Bmin_lot_size_square_meters%5D=&search_criteria%5Bmin_parking_spaces%5D=&search_criteria%5Bmin_total_square_meters%5D=&search_criteria%5Bnetwork_search%5D=true&search_criteria%5Boperation_type%5D=&search_criteria%5Borganization_name%5D=&search_criteria%5Bproperty_type_ids%5D%5B%5D=29058&search_criteria%5Bproperty_type_ids%5D%5B%5D=28552&search_criteria%5Bproperty_type_ids%5D%5B%5D=28311&search_criteria%5Bproperty_type_ids%5D%5B%5D=29057&search_criteria%5Bpublished_after_date%5D=&search_criteria%5Bpublished_before_date%5D=&search_criteria%5Bsort_by%5D=date_activated-desc&search_criteria%5Btext%5D="
-    start_page = input("Enter start page (1): ")
-    driver.get(url.replace('page=2', start_page).replace('PageNo', start_page))
+    url = getElement(driver, '//a[@rel="next"]').get_attribute('href')
+    start_page = "1"
+    if os.path.isfile('last_page.txt'):
+        with open('last_page.txt', 'r') as f:
+            start_page = f.read()
+        print(f'Resuming from page {start_page}')
+    driver.get(url.replace('page=2', start_page))
     info = getElement(driver, '//div[@class="py-2"]').text
     print(info)
     total = int(info.split()[-2])
@@ -70,9 +68,11 @@ def getListings():
     print(f"Page count: {page_count}")
     for i in range(int(start_page), page_count):
         print(f"Working on page {i}")
-        driver.get(url.replace('page=2', str(i)).replace('PageNo', str(i)))
+        driver.get(url.replace('page=2', str(i)))
         print(getElement(driver, '//div[@class="py-2"]').text)
         urls = [a.get_attribute('href') for a in getElements(driver, '//a[@class="d-block text-truncate"]')]
+        with open('last_page.txt', 'w') as f:
+            f.write(str(i))
         with open('urls.txt', 'a') as f:
             f.write("\n".join(urls) + "\n")
     print("Removing duplicates..")
@@ -191,7 +191,7 @@ def main():
         if not os.path.isdir('json'):
             os.mkdir('json')
         scraped = []
-        notavl=[]
+        notavl = []
         if not os.path.isfile('EasyBroker.csv'):
             with open('EasyBroker.csv', 'w', encoding=encoding, newline='') as f:
                 csv.DictWriter(f, fieldnames=fieldnames).writeheader()
@@ -208,7 +208,7 @@ def main():
         threads = []
         with open('urls.txt', 'r') as f:
             urls = f.read().splitlines()
-        for url in urls:
+        for url in set(urls):
             if url in notavl:
                 print(f"Not available {url}")
             elif url in scraped:
