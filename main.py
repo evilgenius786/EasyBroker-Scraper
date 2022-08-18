@@ -101,7 +101,7 @@ def getDetails(url):
             # print(soup)
             data = {
                 "URL": url,
-                "Price": soup.find('h3', {"class": "price"}).text.split()[0] if soup.find('h3',
+                "Price": soup.find('h3', {"class": "price"}).text.strip().replace("\n              "," ") if soup.find('h3',
                                                                                           {"class": "price"}) else "",
                 "Description": soup.find('div', {"class": "description-text"}).text.strip() if soup.find('div', {
                     "class": "description"}) else "",
@@ -149,7 +149,10 @@ def processSoup(data):
         translate = json.load(f)
         for key in translate.keys():
             if key in data.keys() and type(data[key]) is not list:
-                row[translate[key]] = data[key]
+                if translate[key] == 'pisos_numero_piso':
+                    row[translate[key]] = f"{key}: {data[key]}"
+                else:
+                    row[translate[key]] = data[key]
     with open('features.json', encoding=encoding) as f:
         features = json.load(f)
         for key in features.keys():
@@ -323,4 +326,6 @@ ________________________________________________________________________________
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    getDetails("https://www.easybroker.com/mx/inmueble/departamento-en-renta-colonia-roma-zona-tec-roma-monterrey")
+    getDetails("https://www.easybroker.com/mx/inmueble/casa-privada-montejo-e6c91adf-c3f7-4239-9c9a-5fdb67c78924")
