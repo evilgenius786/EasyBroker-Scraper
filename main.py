@@ -326,6 +326,6 @@ ________________________________________________________________________________
 
 
 if __name__ == "__main__":
-    # main()
-    getDetails("https://www.easybroker.com/mx/inmueble/departamento-en-renta-colonia-roma-zona-tec-roma-monterrey")
-    getDetails("https://www.easybroker.com/mx/inmueble/casa-privada-montejo-e6c91adf-c3f7-4239-9c9a-5fdb67c78924")
+    main()
+    # getDetails("https://www.easybroker.com/mx/inmueble/departamento-en-renta-colonia-roma-zona-tec-roma-monterrey")
+    # getDetails("https://www.easybroker.com/mx/inmueble/casa-privada-montejo-e6c91adf-c3f7-4239-9c9a-5fdb67c78924")
