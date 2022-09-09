@@ -59,7 +59,7 @@ def getListings():
         with open('last_page.txt', 'r') as f:
             start_page = f.read()
         print(f'Resuming from page {start_page}')
-    driver.get(url.replace('page=2', start_page))
+    driver.get(url.replace('page=2', f"page={start_page}"))
     info = getElement(driver, '//div[@class="py-2"]').text
     print(info)
     total = int(info.split()[-2])
@@ -68,7 +68,7 @@ def getListings():
     print(f"Page count: {page_count}")
     for i in range(int(start_page), page_count):
         print(f"Working on page {i}")
-        driver.get(url.replace('page=2', str(i)))
+        driver.get(url.replace('page=2', f"page={i}"))
         print(getElement(driver, '//div[@class="py-2"]').text)
         urls = [a.get_attribute('href') for a in getElements(driver, '//a[@class="d-block text-truncate"]')]
         with open('last_page.txt', 'w') as f:
