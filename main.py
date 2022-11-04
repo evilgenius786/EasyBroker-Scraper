@@ -5,11 +5,12 @@ import threading
 import time
 import traceback
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
 
 import openpyxl
 import requests
 from bs4 import BeautifulSoup
+from furl import furl
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -59,17 +60,17 @@ def getListings():
         with open('last_page.txt', 'r') as f:
             start_page = f.read()
         print(f'Resuming from page {start_page}')
-    driver.get(url.replace('page=2', f"page={start_page}"))
-    info = getElement(driver, '//div[@class="py-2"]').text
+    driver.get(parseurl(url,start_page))
+    info = getElement(driver, '//h6/strong/..').text
     print(info)
     total = int(info.split()[-2])
     page_count = int(total / 18) + 1
-    print(f"Properties count: {total}")
+    print(f"Properties coyunt: {total}")
     print(f"Page count: {page_count}")
     for i in range(int(start_page), page_count):
         print(f"Working on page {i}")
-        driver.get(url.replace('page=2', f"page={i}"))
-        print(getElement(driver, '//div[@class="py-2"]').text)
+        driver.get(parseurl(url,i))
+        print(getElement(driver, '//h6/strong/..').text)
         urls = [a.get_attribute('href') for a in getElements(driver, '//a[@class="d-block text-truncate"]')]
         with open('last_page.txt', 'w') as f:
             f.write(str(i))
@@ -101,8 +102,9 @@ def getDetails(url):
             # print(soup)
             data = {
                 "URL": url,
-                "Price": soup.find('h3', {"class": "price"}).text.strip().replace("\n              "," ") if soup.find('h3',
-                                                                                          {"class": "price"}) else "",
+                "Price": soup.find('h3', {"class": "price"}).text.strip().replace("\n              ", " ") if soup.find(
+                    'h3',
+                    {"class": "price"}) else "",
                 "Description": soup.find('div', {"class": "description-text"}).text.strip() if soup.find('div', {
                     "class": "description"}) else "",
                 "Title": soup.find('h5', {"class": "property-title"}).text.strip() if soup.find('h5', {
@@ -183,8 +185,9 @@ def append(data):
 
 def main():
     logo()
+    # choice = "1"
     if test:
-        choice = "2"
+        choice = "1"
     else:
         choice = input("1. Get listings\n2. Get details\n3. Convert CSV to XLSX\n4. Exit\n")
     # choice = "2"
@@ -323,6 +326,14 @@ def logo():
 [+] Multi-threaded
 _______________________________________________________________________________________
 """)
+
+
+def parseurl(url, page):
+    print(url)
+    o = urlparse(url)
+    query = parse_qs(o.query)
+    query['page'] = page
+    return urlunparse((o.scheme, o.netloc, o.path, o.params, urlencode(query, doseq=True), o.fragment))
 
 
 if __name__ == "__main__":
